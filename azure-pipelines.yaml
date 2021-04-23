@@ -1,0 +1,22 @@
+trigger:
+  branches:
+    include:
+      - master
+
+
+# By default, use self-hosted agents
+pool: Default
+
+# Opting out of pull request validation
+pr: none
+
+resources:
+  repositories:
+    # Azure DevOps repository
+    - repository: wp-pipeline
+      type: git
+      # project/repository
+      name: joonast-test/joonast
+
+extends:
+  template: azure-pipelines-wordpress.yml@wp-pipeline
