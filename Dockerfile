@@ -7,6 +7,6 @@ RUN apt-get update && \
 
 COPY ./* wp-content
 
-VOLUME wp-content/uploads
+VOLUME /var/www/html/wp-content/uploads
 
 EXPOSE 8080
