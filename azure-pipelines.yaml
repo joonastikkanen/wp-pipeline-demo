@@ -16,7 +16,7 @@ resources:
     - repository: wp-pipeline
       type: git
       # project/repository
-      name: joonast-test/wp-pipeline
+      name: joonas-test/wp-pipeline
 
 extends:
   template: wordpress-site.yaml@wp-pipeline
