@@ -5,8 +5,8 @@ RUN apt-get update && \
     apt-get -y dist-upgrade && \
     apt-get -y install libfreetype6 libfreetype6-dev
 
-COPY plugins wp-content/
-COPY themes wp-content/
+COPY plugins wp-content/plugins
+COPY themes wp-content/themes
 
 VOLUME /var/www/html/wp-content/uploads
 
