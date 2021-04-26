@@ -5,7 +5,7 @@ trigger:
 
 
 # By default, use self-hosted agents
-pool: Azure Pipelines
+pool:
   vmImage: 'ubuntu-latest'
 # Opting out of pull request validation
 pr: none
