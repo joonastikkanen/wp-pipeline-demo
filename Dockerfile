@@ -12,4 +12,8 @@ COPY themes wp-content/themes
 
 VOLUME /var/www/html/wp-content/uploads
 
+RUN find . -type f -exec chmod 644 {} + && \
+    find . -type d -exec chmod 755 {} + && \
+    chown -R www-data:www-data ./
+
 EXPOSE 8080
