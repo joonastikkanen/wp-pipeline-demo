@@ -5,6 +5,8 @@ RUN apt-get update && \
     apt-get -y dist-upgrade && \
     apt-get -y install libfreetype6 libfreetype6-dev
 
+COPY ports.conf /etc/apache2/ports.conf
+
 COPY plugins wp-content/plugins
 COPY themes wp-content/themes
 
