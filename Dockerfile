@@ -2,8 +2,7 @@ FROM wordpress:5.7.1-php8.0-apache
 LABEL maintainer "Joonas Tikkanen <joonas.tikkanen@ambientia.fi>"
 
 RUN apt-get update && \
-    apt-get -y dist-upgrade && \
-    apt-get -y install libfreetype6 libfreetype6-dev
+    apt-get -y install libfreetype6 libfreetype6-dev wget unzip
 
 COPY conf/ports.conf /etc/apache2/ports.conf
 
@@ -12,10 +11,12 @@ COPY wp-content/themes wp-content/themes
 
 VOLUME /var/www/html/wp-content/uploads
 
-COPY scripts/download_plugins.sh .
-COPY wp_plugins.txt .
+COPY scripts/download_plugins.sh /tmp
+COPY wp_plugins.txt /tmp
 
-RUN ./download_plugins.sh wp_plugins.txt && \
+WORKDIR /tmp
+
+RUN ./download_plugins.sh /tmp/wp_plugins.txt && \
     rm download_plugins.sh wp_plugins.txt
 
 RUN find /var/www/html -type f -exec chmod 644 {} + && \

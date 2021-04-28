@@ -8,6 +8,6 @@ do
   wget https://downloads.wordpress.org/plugin/$PLUGIN_NAME.$PLUGIN_VERSION.zip
   unzip $PLUGIN_NAME.$PLUGIN_VERSION.zip
   rm $PLUGIN_NAME.$PLUGIN_VERSION.zip
-  echo $PLUGIN_NAME " INSTALLED"
+  echo "WORDPRESS PLUGIN "$PLUGIN_NAME " INSTALLED"
   echo
 done
