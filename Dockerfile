@@ -6,8 +6,8 @@ RUN apt-get update && \
 
 COPY conf/ports.conf /etc/apache2/ports.conf
 
-COPY wp-content/plugins wp-content/plugins
-COPY wp-content/themes wp-content/themes
+COPY wp-content/plugins /usr/src/wordpress/wp-content/plugins
+COPY wp-content/themes /usr/src/wordpress/wp-content/themes
 
 VOLUME /var/www/html/wp-content/uploads
 
@@ -16,9 +16,5 @@ COPY wp_plugins.txt /tmp
 
 RUN /tmp/download_plugins.sh /tmp/wp_plugins.txt && \
     rm /tmp/download_plugins.sh /tmp/wp_plugins.txt
-
-RUN find /var/www/html -type f -exec chmod 644 {} + && \
-    find /var/www/html -type d -exec chmod 755 {} + && \
-    chown -R www-data:www-data /var/www/html
 
 EXPOSE 8080

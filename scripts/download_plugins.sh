@@ -1,5 +1,5 @@
 #!/bin/bash
-PLUGINS_FOLDER=/var/www/html/wp-content/plugins
+PLUGINS_FOLDER=/usr/src/wordpress/wp-content/plugins
 for PLUGIN in $1
 do
   echo "DOWNLOADING WORDPRESS PLUGIN "$PLUGIN_NAME
