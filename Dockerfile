@@ -15,7 +15,7 @@ VOLUME /var/www/html/wp-content/uploads
 COPY scripts/download_plugins.sh .
 COPY wp_plugins.txt .
 
-RUN download_plugins.sh wp_plugins.txt && \
+RUN ./download_plugins.sh wp_plugins.txt && \
     rm download_plugins.sh wp_plugins.txt
 
 RUN find /var/www/html -type f -exec chmod 644 {} + && \
