@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    app: wordpress
+spec:
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: wordpress
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: wordpress
+    spec:
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: {{ .Chart.Name }}-config-map
+        - secretRef:
+            name: {{ .Chart.Name }}-secret
+        image: image-registry.openshift-image-registry.svc:5000/{{ .Values.project }}/{{ .Chart.Name }}:{{ .Values.wp.image.tag }}
+        imagePullPolicy: {{ .Valuer.wp.iamge.pullPolicy }}
+{{- if .Values.wp.enableLivenessProbe }}
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            httpHeaders:
+            - name: X-Forwarded-Proto
+              value: https
+            path: /wp-admin/install.php
+            port: 8080
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 90
+{{- end }}
+        name: {{ .Chart.Name }}
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+{{- if .Values.wp.enableReadinessProbe }}
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            httpHeaders:
+            - name: X-Forwarded-Proto
+              value: https
+            path: /wp-admin/install.php
+            port: 8080
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 90
+{{- end }}
+{{- if .Values.resources.enabled -}}
+        resources:
+          limits:
+            cpu: {{ .Values.resources.limits.cpu }}
+            memory: {{ .Values.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.resources.requests.cpu }}
+            memory: {{ .Values.resources.requests.memory }}
+{{- end }}
+        volumeMounts:
+        - mountPath: /var/www/html/wp-content/uploads
+          name: {{ .Values.wp.claimName }}
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: {{ .Values.wp.claimName }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.wp.claimName }}

@@ -1,0 +1,7 @@
+kind: ImageStream
+apiVersion: image.openshift.io/v1
+items:
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    app: wordpress

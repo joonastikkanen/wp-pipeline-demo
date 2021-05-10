@@ -1,0 +1,25 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    app: worpdress
+  name: {{ .Chart.Name }}
+spec:
+  output:
+    to:
+      kind: DockerImage
+      name: image-registry.openshift-image-registry.svc:5000/{{ .Values.project }}/{{ .Chart.Name }}:latest
+  resources:
+    limits:
+      cpu: 800m
+    requests:
+      cpu: 500m
+  source:
+    git:
+      uri: {{ .Values.git.uri }}
+      ref: {{ .Values.git.branch }}
+    type: Git
+  strategy:
+    dockerStrategy:
+      dockerfilePath: {{ .Values.git.dockerfilePath }}
+    type: Docker
