@@ -3,20 +3,28 @@ trigger:
     include:
       - main
 
-
 # By default, use self-hosted agents
 pool:
   vmImage: 'ubuntu-latest'
 # Opting out of pull request validation
 pr: none
 
-resources:
-  repositories:
-    # Azure DevOps repository
-    - repository: wp-pipeline
-      type: git
-      # project/repository
-      name: joonas-test/wp-pipeline
+# Variables specified at the pipeline level
+variables:
+  location: westeurope
 
-extends:
-  template: wordpress-site.yaml@wp-pipeline
+stages:
+#--------------------------- Development environment ------------------------------
+- stage: Development
+  displayName: Development environment
+  variables:
+    - group: development
+    - group: development-kv
+  jobs:
+  # Run Helm
+  - template: helm/azure-pipelines-wordpress.yml
+    parameters:
+      app: wordpress
+      serviceConnection: OPENSHIFT
+      environment: development
+      project: wordpress

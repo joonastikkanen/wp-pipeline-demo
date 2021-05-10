@@ -1,0 +1,65 @@
+
+parameters:
+# Name of the application (A-Z, a-z, 0-9, and underscore)
+- name: app
+  type: string
+# Name of the service connection, e.g. hki-kanslia-cms-dev
+- name: serviceConnection
+  type: string
+# Name of the environment, e.g. development
+- name: environment
+  type: string
+# Name of the project in OpenShift
+- name: project
+  type: string
+jobs:
+- deployment: 'deploy_application'
+  displayName: Deploy configurations for ${{ parameters.app }}
+  environment:
+    name: ${{ parameters.environment }}
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - task: CmdLine@2
+          displayName: Replace environment variables in values.yaml
+          inputs:
+            script: |
+              cat $(Build.SourcesDirectory)/helm/${{ parameters.app }}/values.yaml | envsubst > $(Build.SourcesDirectory)/helm/${{ parameters.app }}/values.yaml.bak
+              mv $(Build.SourcesDirectory)/helm/${{ parameters.app }}/values.yaml.bak $(Build.SourcesDirectory)/helm/${{ parameters.app }}/values.yaml
+        - task: oc-setup@2
+          displayName: Load OC settings to kubectl
+          inputs:
+            connectionType: 'OpenShift Connection Service'
+            openshiftService: '${{ parameters.serviceConnection }}'
+        - task: HelmInstaller@0
+          displayName: Install Helm and kubectl
+          inputs:
+            helmVersion: '3.4.0'
+            installKubectl: true
+        - task: CmdLine@2
+          displayName: Update OpenShift Configuration using Helm
+          inputs:
+            script: |
+              helm upgrade --install ${{ parameters.app }} helm/${{ parameters.app }} -n ${{ parameters.project }} --insecure-skip-tls-verify
+        - task: oc-cmd@2
+          displayName: Start New build
+          inputs:
+            connectionType: 'OpenShift Connection Service'
+            openshiftService: '${{ parameters.serviceConnection }}'
+            cmd: 'oc start-build ${{ parameters.app }} --follow -n ${{ parameters.project }} --insecure-skip-tls-verify=true --wait'
+            uselocalOc: true
+        - task: oc-cmd@2
+          displayName: Start New Deployment
+          inputs:
+            connectionType: 'OpenShift Connection Service'
+            openshiftService: '${{ parameters.serviceConnection }}'
+            cmd: 'oc rollout latest dc/${{ parameters.app }} -n ${{ parameters.project }} --insecure-skip-tls-verify=true'
+            uselocalOc: true
+        - task: oc-cmd@2
+          displayName: Watch New Deployment
+          inputs:
+            connectionType: 'OpenShift Connection Service'
+            openshiftService: '${{ parameters.serviceConnection }}'
+            cmd: 'oc rollout status dc/${{ parameters.app }} -n ${{ parameters.project }} -w'
+            uselocalOc: true
